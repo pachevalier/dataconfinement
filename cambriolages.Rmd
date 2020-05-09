@@ -1,0 +1,92 @@
+---
+title: "Cambriolages"
+output:
+  html_document:
+    code_folding: hide
+    df_print: paged
+    toc: yes
+  html_notebook:
+    code_folding: hide
+    fig_caption: yes
+    toc: yes
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(
+  fig.width=8, fig.height=6, 
+  fig.path='figures/',
+  warning=FALSE, message=FALSE
+  )
+```
+
+```{r}
+library(tidyverse)
+library(wesanderson)
+library(ggthemes)
+library(tricky)
+library(tibbletime)
+library(lubridate)
+pal <- wes_palette("Zissou1", 21, type = "continuous")
+table_fm <- read_csv(file = "data-raw/etat_4001_france_metropolitaine.csv") %>%
+    mutate(
+      date = ymd(paste0(date, "-01"))
+      )
+```
+
+## Cambriolages de résidences principales (France métropolitaine)
+
+```{r}
+ggplot() + 
+  geom_line(
+    data = filter(table_fm, index == 27, year(date) == 2020), 
+    mapping = aes(x = month(date), y = n), 
+    color= "firebrick1"
+  ) +
+  geom_line(
+    data = filter(table_fm, index == 27, year(date) > 2000, year(date) < 2020), 
+    mapping = aes(x = month(date), y = n, group = year(date)), 
+    size = .1, alpha = .5
+  ) + 
+  scale_y_continuous(
+    limits = c(0, NA), 
+    name = "Cambriolages de locaux d'habitations principales",
+    labels = french_formatting) +
+  scale_x_continuous(
+    name = "Mois de l'année",
+    breaks = 1:12
+  ) + 
+  labs(title = "Nombre quotidien de cambriolages de résidences principales, France métropolitaine, 2001-2020",
+       subtitle = "En rouge, l'année 2020, en gris les années 2001 à 2019.",
+       caption = "Source : Ministère de l'Intérieur, chiffres mensuels \nhttps://www.data.gouv.fr/fr/datasets/5617ad4dc751df6211cdbb49/\nversion du 17 avril 2020") +
+  theme_tufte() 
+```
+
+## Cambriolages de résidences secondaires (France métropolitaine)
+
+```{r}
+## Line plot 
+ggplot() + 
+  geom_line(
+    data = filter(table_fm, index == 28, year(date) == 2020), 
+    mapping = aes(x = month(date), y = n), 
+    color= "firebrick1"
+  ) +
+  geom_line(
+    data = filter(table_fm, index == 28, year(date) > 2000, year(date) < 2020), 
+    mapping = aes(x = month(date), y = n, group = year(date)), 
+    size = .1, alpha = .5
+  ) + 
+  scale_y_continuous(
+    limits = c(0, NA), 
+    name = "Cambriolages de résidences secondaires",
+    labels = french_formatting) +
+  scale_x_continuous(
+    name = "Mois de l'année",
+    breaks = 1:12
+  ) + 
+  labs(title = "Nombre quotidien de cambriolages de résidences secondaires, France métropolitaine, 2001-2020",
+       subtitle = "En rouge, l'année 2020, en gris les années 2001 à 2019.",
+       caption = "Source : Ministère de l'Intérieur, chiffres mensuels \nhttps://www.data.gouv.fr/fr/datasets/5617ad4dc751df6211cdbb49/\nversion du 17 avril 2020") +
+  theme_tufte() 
+```
+
